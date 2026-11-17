@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma playlist</title>
+<style>
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;background:#fbe4ec}
+  body{background:radial-gradient(circle at 20% 10%,#fff4f8 0,transparent 45%),radial-gradient(circle at 90% 95%,#f7c2d1 0,transparent 50%),linear-gradient(160deg,#fde9ef,#f9d3de)}
+  .boite{box-sizing:border-box;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(6px,2vh,12px);padding:clamp(10px,3vw,16px)}
+  .haut{display:flex;align-items:center;gap:clamp(10px,4vw,18px);width:100%;justify-content:center;flex-wrap:wrap}
+  .platine{position:relative;width:clamp(84px,34vw,130px);aspect-ratio:1;flex:none}
+  .vinyle{position:absolute;inset:0;border-radius:50%;
+    background:radial-gradient(circle,#f06c86 0 18%,#2a1820 18.5% 20%,#3a2230 20% 24%,#24151c 24% 30%,#3a2230 30% 34%,#24151c 34% 40%,#3a2230 40% 44%,#24151c 44% 50%,#3a2230 50% 54%,#24151c 54% 60%,#3a2230 60% 64%,#1d1016 64% 100%);
+    box-shadow:0 10px 24px rgba(110,21,50,.35), inset 0 0 0 2px rgba(255,255,255,.06);animation:tourne 4s linear infinite}
+  .vinyle::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 20deg,transparent 0 10%,rgba(255,255,255,.18) 14%,transparent 20% 60%,rgba(255,255,255,.12) 64%,transparent 70%)}
+  .vinyle::after{content:"♡";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:clamp(12px,4vw,18px)}
+  .vinyle .trou{position:absolute;left:50%;top:50%;width:6%;height:6%;margin:-3% 0 0 -3%;border-radius:50%;background:#fde9ef}
+  @keyframes tourne{to{transform:rotate(360deg)}}
+  .bras{position:absolute;right:-8%;top:-4%;width:46%;height:60%;transform-origin:85% 10%;transform:rotate(22deg);pointer-events:none}
+  .bras::before{content:"";position:absolute;right:10%;top:4%;width:14px;height:14px;border-radius:50%;background:#e9a3b6;box-shadow:inset 0 0 0 3px #fff}
+  .bras::after{content:"";position:absolute;right:18%;top:14%;width:3px;height:78%;background:linear-gradient(#f5c4d2,#d7809a);border-radius:2px;transform:rotate(18deg);transform-origin:top}
+  .infos{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+  .titre{font:italic 700 clamp(16px,5.5vw,26px)/1.1 "Playfair Display",Georgia,serif;color:#9b2a4e}
+  .sous{font:600 10px/1 system-ui,sans-serif;letter-spacing:3px;text-transform:uppercase;color:#c2185b}
+  .eq{display:flex;align-items:flex-end;gap:3px;height:18px}
+  .eq span{width:4px;border-radius:2px;background:linear-gradient(#f8a5b8,#e2557f);animation:eq 1s ease-in-out infinite}
+  .eq span:nth-child(2){animation-delay:.2s}.eq span:nth-child(3){animation-delay:.45s}.eq span:nth-child(4){animation-delay:.1s}.eq span:nth-child(5){animation-delay:.3s}
+  @keyframes eq{0%,100%{height:25%}50%{height:100%}}
+  .lecteur{position:relative;width:100%;flex:none;height:152px;border-radius:14px;overflow:hidden;box-shadow:0 8px 22px rgba(194,24,91,.2)}
+  .lecteur iframe{position:absolute;left:0;top:0;width:340px;height:152px;border:0;display:block;transform-origin:0 0}
+</style>
+</head>
+<body>
+<div class="boite">
+  <div class="haut">
+    <div class="platine"><div class="vinyle"><div class="trou"></div></div><div class="bras"></div></div>
+    <div class="infos">
+      <div class="sous">En écoute</div>
+      <div class="titre">Ma playlist ♡</div>
+      <div class="eq"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+  </div>
+  <div class="lecteur"><iframe id="sp" title="Ma playlist Spotify" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe></div>
+</div>
+<script>
+  const p=new URLSearchParams(location.search);
+  const id=p.get("playlist")||"2YYUGoxuBuveqT0XBcZH6d";
+  const sp=document.getElementById("sp"), boiteL=document.querySelector(".lecteur");
+  sp.src="https://open.spotify.com/embed/playlist/"+encodeURIComponent(id)+"?utm_source=generator";
+  function ajuste(){ const w=boiteL.clientWidth; if(w>=340){ sp.style.width=w+"px"; sp.style.transform="none"; boiteL.style.height="152px"; }
+    else { const s=w/340; sp.style.width="340px"; sp.style.transform="scale("+s+")"; boiteL.style.height=Math.round(152*s)+"px"; } }
+  ajuste(); addEventListener("resize",ajuste); if(window.ResizeObserver) new ResizeObserver(ajuste).observe(document.body);
+</script>
+</body>
+</html>
