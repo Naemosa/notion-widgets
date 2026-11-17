@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calendrier</title>
+<style>
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;background:#fbe4ec}
+  body{background:radial-gradient(circle at 15% 10%,#fff4f8 0,transparent 45%),linear-gradient(160deg,#fde9ef,#f9d3de)}
+  .boite{box-sizing:border-box;height:100%;display:flex;flex-direction:column;padding:clamp(8px,3vw,16px);gap:clamp(6px,2vh,10px)}
+  .tete{display:flex;align-items:center;justify-content:space-between;background:#8c2346;color:#fff;border-radius:12px;padding:clamp(6px,2vh,10px) 10px}
+  .tete b{font:italic 700 clamp(14px,5vw,20px)/1 "Playfair Display",Georgia,serif;letter-spacing:.5px;text-transform:capitalize}
+  .tete button{border:none;background:rgba(255,255,255,.18);color:#fff;width:28px;height:28px;border-radius:50%;font-size:15px;cursor:pointer}
+  .tete button:hover{background:rgba(255,255,255,.32)}
+  .grille{flex:1;display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:1fr;gap:3px;text-align:center}
+  .jsem{font:700 clamp(9px,2.6vw,12px)/1 system-ui,sans-serif;color:#a8344f;display:flex;align-items:center;justify-content:center;text-transform:uppercase}
+  .j{display:flex;align-items:center;justify-content:center;font:600 clamp(10px,3.2vw,15px)/1 system-ui,sans-serif;color:#6e1532;border-radius:50%;aspect-ratio:1;max-height:100%;margin:auto;width:min(100%,38px)}
+  .j.autre{color:#d9a0b2}
+  .j.we{color:#c2185b}
+  .j.auj{background:#8c2346;color:#fff;box-shadow:0 4px 12px rgba(140,35,70,.35);animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+  .pied{text-align:center;font:italic 600 clamp(11px,3.4vw,14px)/1 "Playfair Display",Georgia,serif;color:#9b2a4e}
+</style>
+</head>
+<body>
+<div class="boite">
+  <div class="tete"><button id="prec" aria-label="Mois précédent">‹</button><b id="titre"></b><button id="suiv" aria-label="Mois suivant">›</button></div>
+  <div class="grille" id="grille"></div>
+  <div class="pied" id="pied"></div>
+</div>
+<script>
+  const mois=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+  const jours=["lun","mar","mer","jeu","ven","sam","dim"];
+  const auj=new Date(); let vue=new Date(auj.getFullYear(),auj.getMonth(),1);
+  function dessine(){
+    const g=document.getElementById("grille"); g.innerHTML="";
+    jours.forEach(j=>{const d=document.createElement("div"); d.className="jsem"; d.textContent=j; g.appendChild(d);});
+    const y=vue.getFullYear(), m=vue.getMonth();
+    document.getElementById("titre").textContent=mois[m]+" "+y;
+    const debut=(new Date(y,m,1).getDay()+6)%7; const nb=new Date(y,m+1,0).getDate(); const nbPrec=new Date(y,m,0).getDate();
+    const total=Math.ceil((debut+nb)/7)*7;
+    for(let i=0;i<total;i++){
+      const d=document.createElement("div"); d.className="j"; let n, autre=false;
+      if(i<debut){ n=nbPrec-debut+i+1; autre=true; } else if(i>=debut+nb){ n=i-debut-nb+1; autre=true; } else n=i-debut+1;
+      d.textContent=n; if(autre) d.classList.add("autre");
+      if(!autre && i%7>=5) d.classList.add("we");
+      if(!autre && y===auj.getFullYear() && m===auj.getMonth() && n===auj.getDate()) d.classList.add("auj");
+      g.appendChild(d);
+    }
+    const reste=new Date(y,m+1,0).getDate()-auj.getDate();
+    document.getElementById("pied").textContent=(y===auj.getFullYear()&&m===auj.getMonth())?(reste===0?"Dernier jour du mois ♡":"Encore "+reste+" jour"+(reste>1?"s":"")+" ce mois-ci ♡"):"♡";
+  }
+  document.getElementById("prec").onclick=()=>{vue=new Date(vue.getFullYear(),vue.getMonth()-1,1);dessine();};
+  document.getElementById("suiv").onclick=()=>{vue=new Date(vue.getFullYear(),vue.getMonth()+1,1);dessine();};
+  dessine();
+</script>
+</body>
+</html>

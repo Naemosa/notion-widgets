@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Humeur du jour</title>
+<style>
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;background:#fbe4ec}
+  body{background:radial-gradient(circle at 85% 12%,#fff4f8 0,transparent 45%),linear-gradient(160deg,#fde9ef,#f9d3de)}
+  .boite{box-sizing:border-box;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,3vh,18px);padding:16px;text-align:center}
+  h1{margin:0;font:italic 700 clamp(18px,5.5vw,28px)/1.1 "Playfair Display",Georgia,serif;color:#9b2a4e}
+  .choix{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(6px,2vw,10px);width:100%;max-width:320px}
+  .choix button{border:2px solid #f3b7c7;background:#fff7f9;border-radius:16px;padding:clamp(6px,1.6vh,10px) 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s,background .2s,border-color .2s}
+  .choix button span{font-size:clamp(20px,7vw,30px);line-height:1}
+  .choix button small{font:600 clamp(9px,2.6vw,11px)/1 system-ui,sans-serif;color:#a8344f}
+  .choix button:hover{transform:translateY(-2px)}
+  .choix button.actif{background:#ec6f90;border-color:#ec6f90;transform:scale(1.05)}
+  .choix button.actif small{color:#fff}
+  .mot{font:italic 600 clamp(13px,3.8vw,17px)/1.3 "Playfair Display",Georgia,serif;color:#6e1532;min-height:1.3em}
+  .semaine{display:flex;gap:6px;justify-content:center}
+  .semaine div{display:flex;flex-direction:column;align-items:center;gap:3px;font:600 9px system-ui,sans-serif;color:#b8637c;text-transform:uppercase}
+  .semaine div b{width:26px;height:26px;border-radius:50%;background:#fff7f9;border:1.5px dashed #f0a9bd;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .semaine div b.plein{border-style:solid;background:#fff}
+</style>
+</head>
+<body>
+<div class="boite">
+  <h1>Mon humeur ♡</h1>
+  <div class="choix" id="choix"></div>
+  <div class="mot" id="mot">Comment tu te sens aujourd'hui ?</div>
+  <div class="semaine" id="semaine"></div>
+</div>
+<script>
+  const humeurs=[["🥰","Rayonnante","Garde cette lumière, elle se voit ♡"],["😊","Sereine","Une belle journée tranquille t'attend."],["💪","Motivée","C'est le jour pour tourner ce reel !"],["😴","Fatiguée","Fais doux aujourd'hui, une chose à la fois."],["🌧️","Difficile","Ça passera. Tu as le droit de ralentir."],["🤍","Reconnaissante","Note-le dans ton journal de gratitude."]];
+  const cle=d=>"humeur-"+d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+  const lire=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+  const ecrire=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+  const auj=new Date();
+  function dessine(){
+    const choisi=lire(cle(auj));
+    const zone=document.getElementById("choix"); zone.innerHTML="";
+    humeurs.forEach(([e,n,m],i)=>{ const b=document.createElement("button"); b.type="button"; b.innerHTML="<span>"+e+"</span><small>"+n+"</small>"; if(choisi==i) b.classList.add("actif");
+      b.onclick=()=>{ ecrire(cle(auj),i); dessine(); }; zone.appendChild(b); });
+    document.getElementById("mot").textContent=choisi!==null?humeurs[choisi][2]:"Comment tu te sens aujourd'hui ?";
+    const s=document.getElementById("semaine"); s.innerHTML=""; const lettres=["D","L","M","M","J","V","S"];
+    for(let k=6;k>=0;k--){ const d=new Date(auj); d.setDate(auj.getDate()-k); const v=lire(cle(d));
+      const c=document.createElement("div"); c.innerHTML="<b class='"+(v!==null?"plein":"")+"'>"+(v!==null?humeurs[v][0]:"")+"</b>"+lettres[d.getDay()]; s.appendChild(c); }
+  }
+  dessine();
+</script>
+</body>
+</html>
