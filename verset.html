@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verset du jour</title>
+<style>
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fbe4ec;font-family:"Playfair Display",Georgia,serif}
+  body{background:radial-gradient(circle at 15% 12%,#fff4f8 0,transparent 45%),radial-gradient(circle at 90% 88%,#f7c2d1 0,transparent 50%),linear-gradient(160deg,#fde9ef,#f9d3de)}
+  .boite{position:relative;box-sizing:border-box;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,3vh,22px);padding:22px clamp(14px,6vw,56px);text-align:center}
+  .croix{font-size:28px;line-height:1;color:#e27b98}
+  .titre{font:700 11px/1 system-ui,sans-serif;letter-spacing:4px;text-transform:uppercase;color:#b03a5b}
+  .verset{font:italic 600 clamp(16px,5.5vw,30px)/1.4 "Playfair Display",Georgia,serif;color:#6e1532;max-width:620px;opacity:0;transform:translateY(8px);transition:opacity .9s ease,transform .9s ease}
+  .verset.la{opacity:1;transform:none}
+  .ref{font:700 13px/1 system-ui,sans-serif;letter-spacing:2px;color:#c2185b}
+  .note{font:500 10px system-ui,sans-serif;letter-spacing:1px;color:#c27d93}
+  button{border:2px solid #ee7f9b;background:#fff7f9;color:#b03a5b;border-radius:999px;padding:8px 18px;font:600 12px system-ui,sans-serif;letter-spacing:1px;cursor:pointer}
+  .lueur{position:absolute;font-size:13px;color:#eaa0b6;opacity:0;animation:lueur 3.4s ease-in-out infinite;pointer-events:none}
+  @keyframes lueur{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:.9;transform:scale(1)}}
+</style>
+</head>
+<body>
+<div class="boite" id="boite">
+  <div class="croix">✝</div>
+  <div class="titre">Verset du jour</div>
+  <div class="verset" id="verset"></div>
+  <div class="ref" id="ref"></div>
+  <button id="autre" type="button">Un autre ♡</button>
+  <div class="note">Bible Louis Segond 1910</div>
+</div>
+<script>
+  const v=[
+    ["L'Éternel est mon berger : je ne manquerai de rien.","Psaume 23:1"],
+    ["Je puis tout par celui qui me fortifie.","Philippiens 4:13"],
+    ["Car rien n'est impossible à Dieu.","Luc 1:37"],
+    ["Recommande ton sort à l'Éternel, mets en lui ta confiance, et il agira.","Psaume 37:5"],
+    ["Venez à moi, vous tous qui êtes fatigués et chargés, et je vous donnerai du repos.","Matthieu 11:28"],
+    ["Confie-toi en l'Éternel de tout ton cœur, et ne t'appuie pas sur ta sagesse.","Proverbes 3:5"],
+    ["Soyez toujours joyeux.","1 Thessaloniciens 5:16"],
+    ["C'est ici la journée que l'Éternel a faite : qu'elle soit pour nous un sujet d'allégresse et de joie !","Psaume 118:24"],
+    ["Ta parole est une lampe à mes pieds, et une lumière sur mon sentier.","Psaume 119:105"],
+    ["L'Éternel est ma lumière et mon salut : de qui aurais-je crainte ?","Psaume 27:1"],
+    ["Cherchez premièrement le royaume et la justice de Dieu ; et toutes ces choses vous seront données par-dessus.","Matthieu 6:33"],
+    ["Je vous laisse la paix, je vous donne ma paix.","Jean 14:27"],
+    ["L'Éternel combattra pour vous ; et vous, gardez le silence.","Exode 14:14"],
+    ["Vous êtes la lumière du monde.","Matthieu 5:14"],
+    ["Nous savons, du reste, que toutes choses concourent au bien de ceux qui aiment Dieu.","Romains 8:28"],
+    ["Je te loue de ce que je suis une créature si merveilleuse.","Psaume 139:14"],
+    ["Demandez, et l'on vous donnera ; cherchez, et vous trouverez ; frappez, et l'on vous ouvrira.","Matthieu 7:7"],
+    ["Déchargez-vous sur lui de tous vos soucis, car lui-même prend soin de vous.","1 Pierre 5:7"],
+    ["La joie de l'Éternel sera votre force.","Néhémie 8:10"],
+    ["Dieu est amour.","1 Jean 4:8"],
+    ["Que tout ce que vous faites se fasse avec charité.","1 Corinthiens 16:14"],
+    ["Rendez grâces en toutes choses.","1 Thessaloniciens 5:18"],
+    ["Heureux ceux qui procurent la paix, car ils seront appelés fils de Dieu !","Matthieu 5:9"],
+    ["Ne crains rien, car je suis avec toi.","Ésaïe 41:10"]
+  ];
+  const el=document.getElementById("verset"), ref=document.getElementById("ref");
+  const n=new Date(); let i=Math.floor((n-new Date(n.getFullYear(),0,0))/864e5)%v.length;
+  function montre(){ el.classList.remove("la"); setTimeout(()=>{ el.textContent="« "+v[i][0]+" »"; ref.textContent=v[i][1]; el.classList.add("la"); },250); }
+  document.getElementById("autre").onclick=()=>{ let j; do{ j=Math.floor(Math.random()*v.length);}while(j===i); i=j; montre(); };
+  montre();
+  const b=document.getElementById("boite");
+  for(let k=0;k<10;k++){ const s=document.createElement("span"); s.className="lueur"; s.textContent=["✦","♡","✿"][k%3]; s.style.left=(4+Math.random()*92)+"%"; s.style.top=(4+Math.random()*92)+"%"; s.style.animationDelay=(Math.random()*3.4)+"s"; b.appendChild(s); }
+</script>
+</body>
+</html>

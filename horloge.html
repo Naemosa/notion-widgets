@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Horloge</title>
+<style>
+  html,body{margin:0;width:100%;height:100%;font-family:"Playfair Display",Georgia,serif;overflow:hidden;background:#fbe4ec}
+  body{background:radial-gradient(circle at 20% 15%,#fff3f7 0,transparent 45%),radial-gradient(circle at 85% 90%,#f7c2d1 0,transparent 50%),linear-gradient(160deg,#fde9ef,#f9d3de)}
+  .scene{position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,3vh,18px)}
+  .ligne{display:flex;align-items:center;gap:clamp(6px,2.5vw,24px)}
+  .carte{position:relative;width:clamp(70px,30vw,190px);aspect-ratio:1/1.05;border-radius:clamp(16px,6vw,30px);
+    background:linear-gradient(160deg,#f9b9ca,#ef8fa9);box-shadow:0 14px 34px rgba(194,24,91,.22), inset 0 2px 0 rgba(255,255,255,.55);
+    display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .carte::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:rgba(255,255,255,.5)}
+  .chiffres{font-size:clamp(34px,15vw,112px);font-weight:700;color:#6e1532;letter-spacing:-2px;line-height:1}
+  .chiffres.flip{animation:flip .45s ease}
+  @keyframes flip{0%{transform:rotateX(0)}50%{transform:rotateX(90deg);opacity:.3}100%{transform:rotateX(0)}}
+  .deux-points{display:flex;flex-direction:column;gap:clamp(6px,2vw,14px)}
+  .deux-points span{width:clamp(6px,2vw,12px);height:clamp(6px,2vw,12px);border-radius:50%;background:#c2185b;animation:battement 1s infinite}
+  @keyframes battement{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.7)}}
+  .date{font:italic 600 clamp(13px,4vw,22px)/1.2 "Playfair Display",Georgia,serif;color:#9b2a4e;text-align:center;padding:0 8px}
+  .secondes{font:600 12px system-ui,sans-serif;color:#c2185b;letter-spacing:4px}
+  .coeur{position:absolute;bottom:-20px;font-size:16px;opacity:0;animation:monte linear infinite;pointer-events:none;color:#e27b98}
+  @keyframes monte{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.85}100%{transform:translateY(-110vh) rotate(25deg);opacity:0}}
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="date" id="date">—</div>
+  <div class="ligne">
+    <div class="carte"><div class="chiffres" id="h">00</div></div>
+    <div class="deux-points"><span></span><span></span></div>
+    <div class="carte"><div class="chiffres" id="m">00</div></div>
+  </div>
+  <div class="secondes" id="s">00</div>
+</div>
+<script>
+  const jours=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+  const mois=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+  const $=id=>document.getElementById(id);
+  function pose(el,val){ if(el.textContent!==val){ el.textContent=val; el.classList.remove("flip"); void el.offsetWidth; el.classList.add("flip"); } }
+  function tic(){
+    const d=new Date(), p=n=>String(n).padStart(2,"0");
+    pose($("h"),p(d.getHours())); pose($("m"),p(d.getMinutes()));
+    $("s").textContent=p(d.getSeconds())+" s";
+    $("date").textContent=jours[d.getDay()]+" "+d.getDate()+" "+mois[d.getMonth()]+" ♡";
+  }
+  tic(); setInterval(tic,1000);
+  const scene=$("scene"), emojis=["♡","🌸","♥","✿"];
+  setInterval(()=>{ const c=document.createElement("span"); c.className="coeur";
+    c.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    c.style.left=(5+Math.random()*90)+"%";
+    c.style.animationDuration=(5+Math.random()*3)+"s"; scene.appendChild(c);
+    setTimeout(()=>c.remove(),8500); },700);
+</script>
+</body>
+</html>

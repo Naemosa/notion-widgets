@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma progression</title>
+<style>
+  html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,sans-serif;overflow:hidden;background:#fbe4ec}
+  body{background:radial-gradient(circle at 85% 10%,#fff3f7 0,transparent 45%),linear-gradient(160deg,#fde9ef,#f9d3de)}
+  .boite{box-sizing:border-box;height:100%;display:flex;flex-direction:column;justify-content:center;gap:clamp(14px,5vh,34px);padding:20px clamp(12px,5vw,40px)}
+  h1{margin:0;text-align:center;font:italic 700 clamp(18px,6vw,30px)/1.1 "Playfair Display",Georgia,serif;color:#9b2a4e}
+  .ligne{display:flex;flex-direction:column;gap:8px}
+  .haut{display:flex;justify-content:space-between;align-items:baseline;font:700 11px/1 system-ui,sans-serif;letter-spacing:2px;text-transform:uppercase;color:#a8344f}
+  .haut span:last-child{font:italic 700 clamp(16px,5vw,24px)/1 "Playfair Display",Georgia,serif;letter-spacing:0;text-transform:none;color:#c2185b}
+  .barre{position:relative;height:clamp(24px,5vh,38px);border:2.5px solid #ee7f9b;border-radius:12px;background:#fff7f9;overflow:hidden}
+  .plein{position:absolute;inset:4px auto 4px 4px;border-radius:8px;background:linear-gradient(90deg,#f8b3c4,#ec6f90);width:0;transition:width 1.6s cubic-bezier(.2,.8,.2,1)}
+  .plein::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.6) 50%,transparent 70%);background-size:200% 100%;animation:brille 2.8s linear infinite}
+  @keyframes brille{from{background-position:200% 0}to{background-position:-200% 0}}
+</style>
+</head>
+<body>
+<div class="boite">
+  <h1>Ma progression ♡</h1>
+  <div class="ligne"><div class="haut"><span>Année</span><span id="tan">0%</span></div><div class="barre"><div class="plein" id="an"></div></div></div>
+  <div class="ligne"><div class="haut"><span>Mois</span><span id="tmo">0%</span></div><div class="barre"><div class="plein" id="mo"></div></div></div>
+  <div class="ligne"><div class="haut"><span>Jour</span><span id="tjo">0%</span></div><div class="barre"><div class="plein" id="jo"></div></div></div>
+</div>
+<script>
+  function maj(){
+    const n=new Date(), y=n.getFullYear(), m=n.getMonth();
+    const an=(n-new Date(y,0,1))/(new Date(y+1,0,1)-new Date(y,0,1));
+    const mo=(n-new Date(y,m,1))/(new Date(y,m+1,1)-new Date(y,m,1));
+    const jo=(n-new Date(y,m,n.getDate()))/864e5;
+    [["an",an],["mo",mo],["jo",jo]].forEach(([id,v])=>{
+      const p=Math.min(100,Math.max(0,v*100));
+      document.getElementById(id).style.width="calc("+p+"% - 8px)";
+      document.getElementById("t"+id).textContent=Math.floor(p)+"%";
+    });
+  }
+  setTimeout(maj,150); setInterval(maj,30000);
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pomodoro</title>
+<style>
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:"Playfair Display",Georgia,serif;background:#fbe4ec}
+  body{background:radial-gradient(circle at 18% 12%,#fff4f8 0,transparent 45%),radial-gradient(circle at 88% 90%,#f7c2d1 0,transparent 50%),linear-gradient(160deg,#fde9ef,#f9d3de)}
+  .boite{box-sizing:border-box;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,2.5vh,18px);padding:16px}
+  .modes{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+  .mode{border:2px solid #ee7f9b;background:#fff7f9;color:#b03a5b;border-radius:999px;padding:6px 12px;font:600 11px system-ui,sans-serif;letter-spacing:1px;cursor:pointer}
+  .mode.actif{background:#ec6f90;color:#fff;border-color:#ec6f90}
+  .anneau{position:relative;width:min(230px,72vw);aspect-ratio:1}
+  svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .fond{fill:none;stroke:#fff7f9;stroke-width:12}
+  .prog{fill:none;stroke:url(#deg);stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset .9s linear}
+  .temps{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .temps b{font:700 clamp(34px,13vw,58px)/1 "Playfair Display",Georgia,serif;color:#6e1532}
+  .temps span{font:italic 600 clamp(11px,3.5vw,15px)/1.4 "Playfair Display",Georgia,serif;color:#b03a5b}
+  .boutons{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  button.b{border:none;background:linear-gradient(160deg,#f6a5ba,#e9678b);color:#fff;border-radius:999px;padding:9px 18px;font:700 12px system-ui,sans-serif;letter-spacing:1px;cursor:pointer;box-shadow:0 6px 16px rgba(194,24,91,.22)}
+  button.b.clair{background:#fff7f9;color:#b03a5b;border:2px solid #ee7f9b;box-shadow:none}
+  .compte{font:600 11px system-ui,sans-serif;letter-spacing:2px;color:#c2185b;text-transform:uppercase;text-align:center}
+</style>
+</head>
+<body>
+<div class="boite">
+  <div class="modes">
+    <button class="mode actif" data-min="25" data-nom="Concentration">Travail 25</button>
+    <button class="mode" data-min="5" data-nom="Petite pause">Pause 5</button>
+    <button class="mode" data-min="15" data-nom="Grande pause">Pause 15</button>
+  </div>
+  <div class="anneau">
+    <svg viewBox="0 0 120 120"><defs><linearGradient id="deg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8b3c4"/><stop offset="1" stop-color="#e2557f"/></linearGradient></defs>
+      <circle class="fond" cx="60" cy="60" r="52"/><circle class="prog" id="prog" cx="60" cy="60" r="52"/></svg>
+    <div class="temps"><b id="t">25:00</b><span id="nom">Concentration ♡</span></div>
+  </div>
+  <div class="boutons"><button class="b" id="go">Lancer</button><button class="b clair" id="raz">Recommencer</button></div>
+  <div class="compte" id="compte">0 séance aujourd'hui</div>
+</div>
+<script>
+  const C=2*Math.PI*52, prog=document.getElementById("prog"); prog.style.strokeDasharray=C;
+  let total=25*60, reste=total, minuteur=null, seances=0;
+  const $=id=>document.getElementById(id);
+  function affiche(){ const m=Math.floor(reste/60), s=reste%60; $("t").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0"); prog.style.strokeDashoffset=C*(1-reste/total); }
+  function son(){ try{ const a=new (window.AudioContext||window.webkitAudioContext)(); [0,0.25,0.5].forEach((d,i)=>{ const o=a.createOscillator(), g=a.createGain(); o.type="sine"; o.frequency.value=[880,1047,1319][i]; g.gain.setValueAtTime(0.0001,a.currentTime+d); g.gain.exponentialRampToValueAtTime(0.25,a.currentTime+d+0.02); g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+d+0.4); o.connect(g).connect(a.destination); o.start(a.currentTime+d); o.stop(a.currentTime+d+0.45); }); }catch(e){} }
+  function stop(){ clearInterval(minuteur); minuteur=null; $("go").textContent="Lancer"; }
+  $("go").onclick=()=>{ if(minuteur){ stop(); $("go").textContent="Reprendre"; return; }
+    $("go").textContent="Pause";
+    minuteur=setInterval(()=>{ reste--; affiche(); if(reste<=0){ stop(); son(); if(document.querySelector(".mode.actif").dataset.min==="25"){ seances++; $("compte").textContent=seances+(seances>1?" séances":" séance")+" aujourd'hui"; } reste=total; affiche(); } },1000); };
+  $("raz").onclick=()=>{ stop(); reste=total; affiche(); };
+  document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{ document.querySelectorAll(".mode").forEach(x=>x.classList.remove("actif")); b.classList.add("actif"); stop(); total=b.dataset.min*60; reste=total; $("nom").textContent=b.dataset.nom+" ♡"; affiche(); });
+  affiche();
+</script>
+</body>
+</html>

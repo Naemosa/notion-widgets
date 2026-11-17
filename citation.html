@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Citation du jour</title>
+<style>
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fbe4ec;font-family:"Playfair Display",Georgia,serif}
+  body{background:radial-gradient(circle at 15% 12%,#fff4f8 0,transparent 45%),radial-gradient(circle at 90% 88%,#f7c2d1 0,transparent 50%),linear-gradient(160deg,#fde9ef,#f9d3de)}
+  .boite{position:relative;box-sizing:border-box;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vh,24px);padding:24px clamp(14px,6vw,64px);text-align:center}
+  .titre{font:700 11px/1 system-ui,sans-serif;letter-spacing:4px;text-transform:uppercase;color:#b03a5b}
+  .noeud{font-size:30px;line-height:1;color:#e27b98}
+  .citation{font:italic 600 clamp(17px,6vw,34px)/1.35 "Playfair Display",Georgia,serif;color:#6e1532;max-width:640px;opacity:0;transform:translateY(8px);transition:opacity .9s ease,transform .9s ease}
+  .citation.la{opacity:1;transform:none}
+  .date{font:600 12px/1 system-ui,sans-serif;letter-spacing:2px;color:#c2185b}
+  button{margin-top:4px;border:2px solid #ee7f9b;background:#fff7f9;color:#b03a5b;border-radius:999px;padding:8px 18px;font:600 12px system-ui,sans-serif;letter-spacing:1px;cursor:pointer;transition:transform .2s,background .2s}
+  button:hover{background:#ffe6ee;transform:scale(1.04)}
+  .etincelle{position:absolute;font-size:14px;color:#e88aa6;opacity:0;animation:brille 3.2s ease-in-out infinite;pointer-events:none}
+  @keyframes brille{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:.9;transform:scale(1)}}
+</style>
+</head>
+<body>
+<div class="boite" id="boite">
+  <div class="noeud">♡</div>
+  <div class="titre">Citation du jour</div>
+  <div class="citation" id="citation"></div>
+  <div class="date" id="date"></div>
+  <button id="autre" type="button">Une autre ♡</button>
+</div>
+<script>
+  const phrases=[
+    "Publier régulier vaut mieux que publier parfait.",
+    "Une seule idée par vidéo, et une idée qui compte.",
+    "Ce que tu crées aujourd'hui, quelqu'un en aura besoin demain.",
+    "Les petits pas de chaque jour font les grandes saisons.",
+    "Ton regard est ta signature. Fais-lui confiance.",
+    "Un café, une idée, un plan : la journée peut commencer.",
+    "Tu n'as pas besoin d'être prête pour commencer.",
+    "La régularité est une forme de talent.",
+    "Chaque story est une petite porte ouverte sur le Café.",
+    "Sois fière de ce que tu as déjà construit.",
+    "Les belles choses prennent le temps qu'il faut.",
+    "Ose le premier jet. Le montage fera le reste.",
+    "Ta créativité n'a pas de date d'expiration.",
+    "On ne compare pas son brouillon au final des autres.",
+    "Aujourd'hui, une chose bien faite suffit.",
+    "Tu as le droit de faire simple et beau.",
+    "Le public aime les gens vrais, pas les gens parfaits.",
+    "Chaque vue est une personne. Raconte-lui une histoire.",
+    "Ce qui te fait sourire fera sourire les autres.",
+    "Tu progresses, même les jours où tu ne le vois pas.",
+    "Le doute est la preuve que tu prends ton travail à cœur.",
+    "Range ton bureau, ton esprit suivra.",
+    "Une bonne idée notée vaut mieux que dix idées oubliées.",
+    "Tu es la créatrice de ton propre rythme.",
+    "La douceur aussi peut être ambitieuse.",
+    "Fais-le avec cœur, le reste suivra.",
+    "Tes idées méritent d'exister en dehors de ta tête.",
+    "Respire, bois ton café, puis lance-toi.",
+    "Ce qui est fait avec amour se voit à l'écran.",
+    "Aujourd'hui est une page blanche, écris-la en rose.",
+    "Tu n'es pas en retard, tu es en chemin."
+  ];
+  const jours=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+  const mois=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+  const el=document.getElementById("citation");
+  const n=new Date();
+  let i=Math.floor((n-new Date(n.getFullYear(),0,0))/864e5)%phrases.length;
+  function montre(){ el.classList.remove("la"); setTimeout(()=>{ el.textContent="« "+phrases[i]+" »"; el.classList.add("la"); },250); }
+  document.getElementById("date").textContent=jours[n.getDay()]+" "+n.getDate()+" "+mois[n.getMonth()];
+  document.getElementById("autre").addEventListener("click",()=>{ let j; do{ j=Math.floor(Math.random()*phrases.length);}while(j===i); i=j; montre(); });
+  montre();
+  const boite=document.getElementById("boite");
+  for(let k=0;k<12;k++){ const s=document.createElement("span"); s.className="etincelle"; s.textContent=["✿","♡","✦"][k%3];
+    s.style.left=(4+Math.random()*92)+"%"; s.style.top=(4+Math.random()*92)+"%"; s.style.animationDelay=(Math.random()*3.2)+"s"; boite.appendChild(s); }
+</script>
+</body>
+</html>
