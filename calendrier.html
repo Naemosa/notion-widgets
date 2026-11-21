@@ -24,14 +24,14 @@
 </head>
 <body>
 <div class="boite">
-  <div class="tete"><button id="prec" aria-label="Mois précédent">‹</button><b id="titre"></b><button id="suiv" aria-label="Mois suivant">›</button></div>
+  <div class="tete"><button id="prec" aria-label="Mois précédent">‹</button><b id="titre" role="button" tabindex="0" title="Revenir à aujourd'hui" style="cursor:pointer"></b><button id="suiv" aria-label="Mois suivant">›</button></div>
   <div class="grille" id="grille"></div>
   <div class="pied" id="pied"></div>
 </div>
 <script>
   const mois=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
   const jours=["lun","mar","mer","jeu","ven","sam","dim"];
-  const auj=new Date(); let vue=new Date(auj.getFullYear(),auj.getMonth(),1);
+  let auj=new Date(); let vue=new Date(auj.getFullYear(),auj.getMonth(),1);
   function dessine(){
     const g=document.getElementById("grille"); g.innerHTML="";
     jours.forEach(j=>{const d=document.createElement("div"); d.className="jsem"; d.textContent=j; g.appendChild(d);});
@@ -50,8 +50,19 @@
     const reste=new Date(y,m+1,0).getDate()-auj.getDate();
     document.getElementById("pied").textContent=(y===auj.getFullYear()&&m===auj.getMonth())?(reste===0?"Dernier jour du mois ♡":"Encore "+reste+" jour"+(reste>1?"s":"")+" ce mois-ci ♡"):"♡";
   }
-  document.getElementById("prec").onclick=()=>{vue=new Date(vue.getFullYear(),vue.getMonth()-1,1);dessine();};
-  document.getElementById("suiv").onclick=()=>{vue=new Date(vue.getFullYear(),vue.getMonth()+1,1);dessine();};
+  function change(delta){ vue=new Date(vue.getFullYear(),vue.getMonth()+delta,1); dessine(); }
+  function aujourdhui(){ vue=new Date(auj.getFullYear(),auj.getMonth(),1); dessine(); }
+  document.getElementById("prec").onclick=()=>change(-1);
+  document.getElementById("suiv").onclick=()=>change(1);
+  const titre=document.getElementById("titre");
+  titre.onclick=aujourdhui;
+  titre.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); aujourdhui(); } };
+  document.addEventListener("keydown",e=>{ if(e.key==="ArrowLeft") change(-1); else if(e.key==="ArrowRight") change(1); });
+  let tx=null, ty=null;
+  const grille=document.getElementById("grille");
+  grille.addEventListener("touchstart",e=>{ tx=e.touches[0].clientX; ty=e.touches[0].clientY; },{passive:true});
+  grille.addEventListener("touchend",e=>{ if(tx===null) return; const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty; tx=null; if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)) change(dx<0?1:-1); });
+  setInterval(()=>{ const n=new Date(); if(n.toDateString()!==auj.toDateString()){ auj=n; dessine(); } },60000);
   dessine();
 </script>
 </body>
