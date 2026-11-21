@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mes widgets Notion</title>
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 24px 16px 40px;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #9b2a4e;
+    background: radial-gradient(circle at 15% 10%,#fff4f8 0,transparent 45%),linear-gradient(160deg,#fde9ef,#f9d3de);
+  }
+  header {
+    max-width: 1200px;
+    margin: 0 auto 28px;
+    text-align: center;
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-family: "Playfair Display", Georgia, serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 2rem;
+    color: #9b2a4e;
+  }
+  .intro {
+    margin: 0;
+    font-size: 15px;
+    color: #b03a5b;
+  }
+  .grille {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .carte {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    box-sizing: border-box;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(238,127,155,0.35);
+    border-radius: 20px;
+    box-shadow: 0 6px 18px rgba(155,42,78,0.08);
+  }
+  .etiquette {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #c2185b;
+  }
+  .carte h2 {
+    margin: 0;
+    font-family: "Playfair Display", Georgia, serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: #9b2a4e;
+  }
+  .description {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #b03a5b;
+  }
+  .params {
+    margin: 0;
+    font-size: 12px;
+    color: #c2185b;
+    word-break: break-all;
+  }
+  .apercu {
+    display: block;
+    width: 100%;
+    height: 220px;
+    border: 0;
+    border-radius: 14px;
+    background: #fff;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+  }
+  .bouton {
+    display: inline-block;
+    box-sizing: border-box;
+    padding: 8px 16px;
+    border: 2px solid #ee7f9b;
+    background: #fff7f9;
+    color: #b03a5b;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .bouton:hover,
+  .bouton:focus-visible {
+    background: #fde3ea;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Mes widgets Notion ♡</h1>
+    <p class="intro">Copie un lien, puis dans Notion tape /embed et colle-le.</p>
+  </header>
+  <main class="grille" id="grille"></main>
+
+<script>
+  const WIDGETS = [
+    { fichier: "horloge.html",    nom: "Horloge",            description: "Heure et date en cartes roses", parametres: "" },
+    { fichier: "calendrier.html", nom: "Calendrier",         description: "Mois en cours, aujourd'hui mis en avant", parametres: "" },
+    { fichier: "meteo.html",      nom: "Météo",              description: "Météo en direct", parametres: "?ville=Paris&lat=48.85&lon=2.35" },
+    { fichier: "pomodoro.html",   nom: "Pomodoro",           description: "Minuteur travail / pause", parametres: "" },
+    { fichier: "progression.html",nom: "Ma progression",     description: "Année, mois et jour en barres", parametres: "" },
+    { fichier: "humeur.html",     nom: "Humeur du jour",     description: "Suivi d'humeur sur 7 jours", parametres: "" },
+    { fichier: "citation.html",   nom: "Citation du jour",   description: "Phrase de motivation", parametres: "" },
+    { fichier: "verset.html",     nom: "Verset du jour",     description: "Verset biblique (Louis Segond)", parametres: "" },
+    { fichier: "playlist.html",   nom: "Ma playlist",        description: "Lecteur Spotify", parametres: "?playlist=2YYUGoxuBuveqT0XBcZH6d" },
+    { fichier: "petales.html",    nom: "Pluie de pétales",   description: "Fond animé", parametres: "?texte=Bonne%20journ%C3%A9e" }
+  ];
+
+  function copierTexte(texte) {
+    // Repli : champ caché sélectionné puis commande "copier" du navigateur.
+    const champ = document.createElement("input");
+    champ.type = "text";
+    champ.value = texte;
+    champ.readOnly = true;
+    champ.style.position = "fixed";
+    champ.style.top = "0";
+    champ.style.left = "0";
+    champ.style.opacity = "0";
+    document.body.appendChild(champ);
+    champ.select();
+    champ.setSelectionRange(0, texte.length);
+    let ok = false;
+    try {
+      ok = document.execCommand("copy");
+    } catch (e) {
+      ok = false;
+    }
+    champ.remove();
+    return ok;
+  }
+
+  function afficherCopie(bouton) {
+    bouton.textContent = "Copié ✓";
+    setTimeout(() => { bouton.textContent = bouton.dataset.libelle; }, 1500);
+  }
+
+  function copierLien(url, bouton) {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(
+          () => afficherCopie(bouton),
+          () => { if (copierTexte(url)) afficherCopie(bouton); }
+        );
+        return;
+      }
+    } catch (e) {
+      // on passe au repli ci-dessous
+    }
+    if (copierTexte(url)) afficherCopie(bouton);
+  }
+
+  function creerCarte(widget) {
+    const url = new URL(widget.fichier + widget.parametres, location.href).href;
+
+    const carte = document.createElement("article");
+    carte.className = "carte";
+
+    const etiquette = document.createElement("div");
+    etiquette.className = "etiquette";
+    etiquette.textContent = widget.fichier;
+
+    const titre = document.createElement("h2");
+    titre.textContent = widget.nom;
+
+    const description = document.createElement("p");
+    description.className = "description";
+    description.textContent = widget.description;
+
+    carte.append(etiquette, titre, description);
+
+    if (widget.parametres) {
+      const params = document.createElement("p");
+      params.className = "params";
+      params.textContent = widget.parametres;
+      carte.appendChild(params);
+    }
+
+    const apercu = document.createElement("iframe");
+    apercu.className = "apercu";
+    apercu.src = url;
+    apercu.loading = "lazy";
+    apercu.title = "Aperçu : " + widget.nom;
+    carte.appendChild(apercu);
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const boutonCopier = document.createElement("button");
+    boutonCopier.type = "button";
+    boutonCopier.className = "bouton";
+    boutonCopier.dataset.libelle = "Copier le lien";
+    boutonCopier.textContent = "Copier le lien";
+    boutonCopier.addEventListener("click", () => copierLien(url, boutonCopier));
+
+    const lienOuvrir = document.createElement("a");
+    lienOuvrir.className = "bouton";
+    lienOuvrir.href = url;
+    lienOuvrir.target = "_blank";
+    lienOuvrir.rel = "noopener";
+    lienOuvrir.textContent = "Ouvrir";
+
+    actions.append(boutonCopier, lienOuvrir);
+    carte.appendChild(actions);
+
+    return carte;
+  }
+
+  const grille = document.getElementById("grille");
+  WIDGETS.forEach(widget => grille.appendChild(creerCarte(widget)));
+</script>
+</body>
+</html>

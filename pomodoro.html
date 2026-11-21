@@ -41,17 +41,23 @@
 </div>
 <script>
   const C=2*Math.PI*52, prog=document.getElementById("prog"); prog.style.strokeDasharray=C;
-  let total=25*60, reste=total, minuteur=null, seances=0;
+  let total=25*60, reste=total, minuteur=null, fin=0, seances=0;
   const $=id=>document.getElementById(id);
-  function affiche(){ const m=Math.floor(reste/60), s=reste%60; $("t").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0"); prog.style.strokeDashoffset=C*(1-reste/total); }
+  const cle=d=>"pomodoro-"+d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+  const lire=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+  const ecrire=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+  const compteDuJour=()=>{ const n=parseInt(lire(cle(new Date())),10); return isNaN(n)?0:n; };
+  function affichCompte(){ $("compte").textContent=seances+(seances>1?" séances":" séance")+" aujourd'hui"; }
+  function affiche(){ const m=Math.floor(reste/60), s=reste%60; const t=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0"); $("t").textContent=t; document.title=minuteur?t+" · Pomodoro":"Pomodoro"; prog.style.strokeDashoffset=C*(1-reste/total); }
   function son(){ try{ const a=new (window.AudioContext||window.webkitAudioContext)(); [0,0.25,0.5].forEach((d,i)=>{ const o=a.createOscillator(), g=a.createGain(); o.type="sine"; o.frequency.value=[880,1047,1319][i]; g.gain.setValueAtTime(0.0001,a.currentTime+d); g.gain.exponentialRampToValueAtTime(0.25,a.currentTime+d+0.02); g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+d+0.4); o.connect(g).connect(a.destination); o.start(a.currentTime+d); o.stop(a.currentTime+d+0.45); }); }catch(e){} }
-  function stop(){ clearInterval(minuteur); minuteur=null; $("go").textContent="Lancer"; }
-  $("go").onclick=()=>{ if(minuteur){ stop(); $("go").textContent="Reprendre"; return; }
-    $("go").textContent="Pause";
-    minuteur=setInterval(()=>{ reste--; affiche(); if(reste<=0){ stop(); son(); if(document.querySelector(".mode.actif").dataset.min==="25"){ seances++; $("compte").textContent=seances+(seances>1?" séances":" séance")+" aujourd'hui"; } reste=total; affiche(); } },1000); };
+  function stop(){ clearInterval(minuteur); minuteur=null; $("go").textContent="Lancer"; document.title="Pomodoro"; }
+  function calcule(){ reste=Math.max(0,Math.ceil((fin-Date.now())/1000)); }
+  function tick(){ calcule(); affiche(); if(reste<=0){ stop(); son(); if(document.querySelector(".mode.actif").dataset.min==="25"){ seances=compteDuJour()+1; ecrire(cle(new Date()),String(seances)); affichCompte(); } reste=total; affiche(); } }
+  $("go").onclick=()=>{ if(minuteur){ calcule(); stop(); $("go").textContent="Reprendre"; affiche(); return; }
+    fin=Date.now()+reste*1000; $("go").textContent="Pause"; minuteur=setInterval(tick,250); tick(); };
   $("raz").onclick=()=>{ stop(); reste=total; affiche(); };
   document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{ document.querySelectorAll(".mode").forEach(x=>x.classList.remove("actif")); b.classList.add("actif"); stop(); total=b.dataset.min*60; reste=total; $("nom").textContent=b.dataset.nom+" ♡"; affiche(); });
-  affiche();
+  seances=compteDuJour(); affichCompte(); affiche();
 </script>
 </body>
 </html>
